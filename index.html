@@ -74,7 +74,6 @@
         const serverUrl = "https://abda3b22-53a0-45f3-bf56-922c35468101-00-3ofkf9d95ockl.worf.replit.dev";  // Replace with your actual server URL
         const socket = io(serverUrl);
 
-        // Handle the send button click
         document.getElementById('sendButton').addEventListener('click', () => {
             const message = document.getElementById('chatInput').value.trim();
 
@@ -85,12 +84,10 @@
             }
         });
 
-        // Listen for incoming chat messages
         socket.on('chat message', (msg) => {
             appendMessage(msg, 'system');
         });
 
-        // Append message to the chat window
         function appendMessage(msg, type) {
             const chatMessages = document.getElementById('chatMessages');
             const messageElement = document.createElement('div');
@@ -101,7 +98,6 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;  // Auto-scroll to the bottom
         }
 
-        // Login functionality
         async function login(customId) {
             try {
                 const response = await fetch(`${serverUrl}/login`, {
