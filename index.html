@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend - PlayFab Login</title>
+</head>
+<body>
+    <h1>Login with PlayFab</h1>
+    <input type="text" id="customId" placeholder="Enter Custom ID" />
+    <button onclick="login()">Login</button>
+    <div id="response"></div>
+
+    <script>
+        function login() {
+            const customId = document.getElementById('customId').value;
+            if (!customId) {
+                alert('Please enter a Custom ID');
+                return;
+            }
+            const loginData = { customId: customId };
+            fetch('http://abda3b22-53a0-45f3-bf56-922c35468101-00-3ofkf9d95ockl.worf.replit.dev/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                document.getElementById('response').textContent = `Logged in successfully: ${JSON.stringify(data)}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('response').textContent = `Error: ${error.message}`;
+            });
+        }
+    </script>
+</body>
+</html>
