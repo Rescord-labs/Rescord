@@ -3,37 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontend - PlayFab Login</title>
+    <title>Rescord - Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+        .chat-message {
+            padding: 10px;
+            background-color: #e1e1e1;
+            margin: 5px 0;
+            border-radius: 10px;
+        }
+        .chat-message.user {
+            background-color: #d2ffd2;
+            text-align: right;
+        }
+        .chat-message.system {
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+        #chat-input {
+            width: calc(100% - 80px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #send-button {
+            padding: 10px;
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Login with PlayFab</h1>
-    <input type="text" id="customId" placeholder="Enter Custom ID" />
-    <button onclick="login()">Login</button>
-    <div id="response"></div>
 
+    <div class="chat-container">
+        <h2>Rescord Chat</h2>
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button id="sendButton">Send</button>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <script>
-        function login() {
-            const customId = document.getElementById('customId').value;
-            if (!customId) {
-                alert('Please enter a Custom ID');
-                return;
+        const serverUrl = "https://abda3b22-53a0-45f3-bf56-922c35468101-00-3ofkf9d95ockl.worf.replit.dev";  // Replace with your actual server URL
+        const socket = io(serverUrl);
+
+        // Handle the send button click
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = document.getElementById('chatInput').value.trim();
+
+            if (message) {
+                socket.emit('chat message', message);  // Send message to backend
+                appendMessage(message, 'user');
+                document.getElementById('chatInput').value = '';  // Clear input
             }
-            const loginData = { customId: customId };
-            fetch('http://abda3b22-53a0-45f3-bf56-922c35468101-00-3ofkf9d95ockl.worf.replit.dev/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(loginData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                document.getElementById('response').textContent = `Logged in successfully: ${JSON.stringify(data)}`;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('response').textContent = `Error: ${error.message}`;
-            });
+        });
+
+        // Listen for incoming chat messages
+        socket.on('chat message', (msg) => {
+            appendMessage(msg, 'system');
+        });
+
+        // Append message to the chat window
+        function appendMessage(msg, type) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', type);
+            messageElement.textContent = msg;
+            chatMessages.appendChild(messageElement);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;  // Auto-scroll to the bottom
         }
+
+        // Login functionality
+        async function login(customId) {
+            try {
+                const response = await fetch(`${serverUrl}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customId })
+                });
+
+                const data = await response.json();
+                console.log('Login success:', data);
+                // Handle login success logic
+            } catch (error) {
+                console.error('Login error:', error);
+            }
+        }
+
+        // Call login with a sample customId (for testing purposes)
+        login('testUser123');  // Replace with the actual user ID
     </script>
 </body>
 </html>
